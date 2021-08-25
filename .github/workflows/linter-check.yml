@@ -1,0 +1,22 @@
+name: linter-check
+
+on:
+  push:
+    branches:
+      - '**'
+      
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      name: 'setup node'
+      with:
+        node-version: '14.15.1'
+    
+    - name: 'install npm'
+      run: npm i
+      
+    - name: 'test'
+      run: make lint
