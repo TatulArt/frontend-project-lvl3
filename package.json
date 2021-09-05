@@ -1,7 +1,7 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "RSS aggregator",
+  "description": "RSS agregator",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -35,6 +35,7 @@
     "webpack-dev-server": "^4.0.0"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "bootstrap": "^5.1.0",
     "i18next": "^20.4.0",
     "on-change": "^3.0.2",

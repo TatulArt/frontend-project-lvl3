@@ -1,52 +1,60 @@
-import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
-import textResources from './textResources';
-import renderFeeds from './renderFeeds.js';
+import parseData from './utilities/parser.js';
+import watch from './watch.js';
+import makeRequest from './utilities/requestMaker.js';
+import translatePage from './utilities/translator.js';
 
 const app = () => {
-  const state = {
-    rssFeeds: [],
-  };
+  translatePage('ru');
 
-  const watchedState = onChange(state, (path, value) => {
-    if (path === 'rssFeeds') {
-      renderFeeds(value);
-    }
-  });
-
-  i18next.init({
-    lng: 'ru',
-    debug: true,
-    resources: textResources,
-  }).then(() => {
-    document.getElementById('app-name').innerHTML = i18next.t('appName');
-    document.getElementById('app-description').innerHTML = i18next.t('appDescription');
-    document.getElementById('url-input').setAttribute('placeholder', i18next.t('inputPlaceholder'));
-    document.getElementById('main-button').innerHTML = i18next.t('button');
-    document.getElementById('example').innerHTML = i18next.t('example');
+  const watchedState = watch({
+    status: '',
+    feedback: '',
+    rssFeeds: {
+      addedUrls: [],
+      parsedFeeds: [],
+    },
   });
 
   const form = document.getElementById('form');
-
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
     const inputData = formData.get('url-input');
 
-    const validationSchema = yup.string().url().notOneOf(watchedState.rssFeeds);
+    const validationSchema = yup
+      .string()
+      .url()
+      .notOneOf(watchedState.rssFeeds.addedUrls);
 
     validationSchema
       .isValid(inputData)
       .then((isValid) => {
-        watchedState.isValid = isValid;
+        watchedState.status = 'loading';
 
-        if (isValid) {
-          watchedState.rssFeeds.push(inputData);
-        } else {
-          watchedState.error = watchedState.rssFeeds.indexOf(inputData) !== -1 ? `Already existing RSS feed: '${inputData}'!` : `Invalid RSS feed: '${inputData}'!`;
+        if (!isValid) {
+          watchedState.status = 'failed';
+          watchedState.feedback = watchedState.rssFeeds.addedUrls.indexOf(inputData) !== -1 ? i18next.t('existingUrlMessage') : i18next.t('invalidUrlMessage');
+          return;
         }
+
+        makeRequest(inputData)
+          .then((response) => {
+            if (response.data.status.error !== undefined) {
+              watchedState.status = 'failed';
+              watchedState.feedback = i18next.t('notFoundMessage');
+              return;
+            }
+
+            const parsedRss = parseData(response.data.contents);
+            watchedState.rssFeeds.parsedFeeds.push(parsedRss);
+            watchedState.rssFeeds.addedUrls.push(inputData);
+
+            watchedState.status = 'loaded';
+            watchedState.feedback = i18next.t('successMessage');
+          });
       });
   });
 };
