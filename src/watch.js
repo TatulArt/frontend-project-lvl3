@@ -26,7 +26,7 @@ const watch = (state) => onChange(state, (path, value) => {
       break;
     case 'rssFeeds.addedUrls':
       clearTimer();
-      setTimer(5000, () => refreshPosts(value[value.length - 1]));
+      setTimer(5000, () => refreshPosts(value));
 
       break;
 

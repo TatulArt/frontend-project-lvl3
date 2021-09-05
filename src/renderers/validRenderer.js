@@ -5,7 +5,40 @@ const resetInput = () => {
   input.focus();
 };
 
-const renderFeeds = (feeds) => {
+export const renderPosts = (feeds) => {
+  const postsList = document.getElementById('posts-list');
+  postsList.innerHTML = '';
+
+  feeds.forEach((feed) => {
+    const posts = Array.from(feed.getElementsByTagName('item'));
+
+    posts.forEach((post) => {
+      const title = post.getElementsByTagName('title')[0].innerHTML;
+      const link = post.getElementsByTagName('link')[0].innerHTML;
+      const description = post.getElementsByTagName('description')[0].innerHTML;
+
+      const postElement = document.createElement('li');
+
+      const postLink = document.createElement('a');
+      postLink.innerHTML = title;
+      postLink.setAttribute('href', link);
+      postLink.setAttribute('target', '_blank');
+      postLink.classList.add('fw-bold');
+
+      const descriptionElement = document.createElement('p');
+      descriptionElement.textContent = description;
+
+      postElement.append(postLink);
+      postElement.append(descriptionElement);
+      postsList.append(postElement);
+    });
+  });
+};
+
+const renderValid = (feeds) => {
+  resetInput();
+  renderPosts(feeds);
+
   const feedsList = document.getElementById('feeds-list');
   feedsList.innerHTML = '';
 
@@ -24,39 +57,6 @@ const renderFeeds = (feeds) => {
     feedElement.append(descriptionElement);
     feedsList.append(feedElement);
   });
-};
-
-export const renderPosts = (feed) => {
-  const posts = Array.from(feed.getElementsByTagName('item'));
-  const postsList = document.getElementById('posts-list');
-  postsList.innerHTML = '';
-
-  posts.forEach((post) => {
-    const title = post.getElementsByTagName('title')[0].innerHTML;
-    const link = post.getElementsByTagName('link')[0].innerHTML;
-    const description = post.getElementsByTagName('description')[0].innerHTML;
-
-    const postElement = document.createElement('li');
-
-    const postLink = document.createElement('a');
-    postLink.innerHTML = title;
-    postLink.setAttribute('href', link);
-    postLink.setAttribute('target', '_blank');
-    postLink.classList.add('fw-bold');
-
-    const descriptionElement = document.createElement('p');
-    descriptionElement.textContent = description;
-
-    postElement.append(postLink);
-    postElement.append(descriptionElement);
-    postsList.append(postElement);
-  });
-};
-
-const renderValid = (feeds) => {
-  resetInput();
-  renderFeeds(feeds);
-  renderPosts(feeds.pop());
 };
 
 export default renderValid;
