@@ -17,6 +17,11 @@ const translatePage = (lng) => {
           invalidUrlMessage: 'Ссылка должна быть валидным URL',
           existingUrlMessage: 'RSS уже существует',
           notFoundMessage: 'Ресурс не содержит валидный RSS',
+          descriptionBtn: 'Просмотр',
+          feeds: 'Фиды',
+          posts: 'Посты',
+          modalMore: 'Читать полностью',
+          modalClose: 'Закрыть',
         },
       },
       en: {
@@ -30,6 +35,11 @@ const translatePage = (lng) => {
           invalidUrlMessage: 'Link must be valid URL',
           existingUrlMessage: 'RSS already existing',
           notFoundMessage: 'Resource does not contain valid RSS',
+          descriptionBtn: 'Wiew',
+          feeds: 'Feeds',
+          posts: 'Posts',
+          modalMore: 'Read more',
+          modalClose: 'Close',
         },
       },
     },
@@ -41,6 +51,8 @@ const translatePage = (lng) => {
     document.getElementById('input-label').innerHTML = i18next.t('inputPlaceholder');
     document.getElementById('main-button').innerHTML = i18next.t('button');
     document.getElementById('example').innerHTML = i18next.t('example');
+    document.getElementById('modal-more').innerHTML = i18next.t('modalMore');
+    document.getElementById('modal-close').innerHTML = i18next.t('modalClose');
   });
 
   yup.setLocale({

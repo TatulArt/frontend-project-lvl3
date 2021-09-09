@@ -1,14 +1,25 @@
 import makeRequest from './requestMaker';
 import parseData from './parser';
-import { renderPosts } from '../renderers/validRenderer.js';
+import renderPosts from '../renderers/listsContentRenderers/postsRenderer.js';
 
-const refreshPosts = (urls) => {
+const refreshPosts = (urls, existingPosts) => {
   const responses = urls.map((url) => makeRequest(url));
   const responsesArray = Promise.all(responses);
 
   responsesArray
     .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
-    .then((allParsedRss) => renderPosts(allParsedRss));
+    .then((allParsedRss) => {
+      const freshPosts = allParsedRss.map((parsedRss) => Array.from(parsedRss.getElementsByTagName('item'))).flat();
+
+      const freshPostsContent = freshPosts.map((post) => post.innerHTML);
+      const existingPostsContent = existingPosts.map((post) => post.innerHTML);
+
+      const newPosts = freshPostsContent
+        .filter((postContent) => !existingPostsContent.includes(postContent))
+        .map((newPostContent) => freshPosts[freshPostsContent.indexOf(newPostContent)]);
+
+      renderPosts([...newPosts, ...existingPosts]);
+    });
 };
 
 export default refreshPosts;

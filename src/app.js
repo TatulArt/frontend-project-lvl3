@@ -11,9 +11,13 @@ const app = () => {
   const watchedState = watch({
     status: '',
     feedback: '',
-    rssFeeds: {
+    rssContent: {
       addedUrls: [],
-      parsedFeeds: [],
+      feeds: [],
+      posts: {
+        existingPosts: [],
+        readedPosts: [],
+      },
     },
   });
 
@@ -27,7 +31,7 @@ const app = () => {
     const validationSchema = yup
       .string()
       .url()
-      .notOneOf(watchedState.rssFeeds.addedUrls);
+      .notOneOf(watchedState.rssContent.addedUrls);
 
     validationSchema
       .isValid(inputData)
@@ -36,7 +40,7 @@ const app = () => {
 
         if (!isValid) {
           watchedState.status = 'failed';
-          watchedState.feedback = watchedState.rssFeeds.addedUrls.indexOf(inputData) !== -1 ? i18next.t('existingUrlMessage') : i18next.t('invalidUrlMessage');
+          watchedState.feedback = watchedState.rssContent.addedUrls.indexOf(inputData) !== -1 ? i18next.t('existingUrlMessage') : i18next.t('invalidUrlMessage');
           return;
         }
 
@@ -48,12 +52,15 @@ const app = () => {
               return;
             }
 
-            const parsedRss = parseData(response.data.contents);
-            watchedState.rssFeeds.parsedFeeds.push(parsedRss);
-            watchedState.rssFeeds.addedUrls.push(inputData);
-
             watchedState.status = 'loaded';
+            watchedState.rssContent.addedUrls.push(inputData);
             watchedState.feedback = i18next.t('successMessage');
+
+            const parsedRss = parseData(response.data.contents);
+            watchedState.rssContent.feeds.push(parsedRss);
+
+            const posts = Array.from(parsedRss.getElementsByTagName('item'));
+            watchedState.rssContent.posts.existingPosts.push(...posts);
           });
       });
   });

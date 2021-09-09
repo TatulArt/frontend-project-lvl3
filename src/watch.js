@@ -1,5 +1,6 @@
 import onChange from 'on-change';
 import renderers from './renderers';
+import resetInput from './utilities/inputReseter';
 import refreshPosts from './utilities/postsRefresher.js';
 import { setTimer, clearTimer } from './utilities/timer.js';
 
@@ -14,6 +15,9 @@ const watch = (state) => onChange(state, (path, value) => {
       if (value === 'loading') {
         renderers.blockButton();
       }
+      if (value === 'loaded') {
+        resetInput();
+      }
 
       break;
 
@@ -21,13 +25,20 @@ const watch = (state) => onChange(state, (path, value) => {
       renderers.renderFeedback(value, state.status);
       break;
 
-    case 'rssFeeds.parsedFeeds':
-      renderers.renderValid(value);
-      break;
-    case 'rssFeeds.addedUrls':
-      clearTimer();
-      setTimer(5000, () => refreshPosts(value));
+    case 'rssContent.posts.existingPosts':
+      renderers.renderPosts(value);
 
+      clearTimer();
+      setTimer(5000, () => refreshPosts(state.rssContent.addedUrls, value));
+      break;
+    case 'rssContent.feeds':
+      renderers.renderFeeds(value);
+      break;
+
+    case 'rssContent.addedUrls':
+      if (value.length === 1) {
+        renderers.renderLists();
+      }
       break;
 
     default:
