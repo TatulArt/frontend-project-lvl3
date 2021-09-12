@@ -48,7 +48,19 @@ const app = () => {
           .then((response) => {
             if (response.data.status.error !== undefined) {
               watchedState.status = 'failed';
-              watchedState.feedback = i18next.t('notFoundMessage');
+
+              switch (response.data.status.error.name) {
+                case 'RequestError':
+                  watchedState.feedback = i18next.t('notFoundMessage');
+                  break;
+                case 'NetworkError':
+                  watchedState.feedback = i18next.t('networkErrorMessage');
+                  break;
+                default:
+                  watchedState.feedback = `Unknown error: ${response.data.status.error.name}`;
+                  break;
+              }
+
               return;
             }
 

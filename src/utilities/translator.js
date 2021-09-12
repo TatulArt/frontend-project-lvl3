@@ -10,34 +10,45 @@ const translatePage = (lng) => {
         translation: {
           appName: 'RSS агрегатор',
           appDescription: 'Начните читать RSS сегодня! Это легко, это красиво.',
+
           inputPlaceholder: 'Ссылка RSS',
           button: 'Добавить',
-          example: 'Пример: https://ru.hexlet.io/lessons.rss',
+          example: 'Пример: http://lorem-rss.herokuapp.com/feed',
+
           successMessage: 'RSS успешно загружен',
           invalidUrlMessage: 'Ссылка должна быть валидным URL',
           existingUrlMessage: 'RSS уже существует',
           notFoundMessage: 'Ресурс не содержит валидный RSS',
-          descriptionBtn: 'Просмотр',
+          networkErrorMessage: 'Ошибка сети',
+
           feeds: 'Фиды',
           posts: 'Посты',
+
+          openModalBtn: 'Просмотр',
           modalMore: 'Читать полностью',
           modalClose: 'Закрыть',
         },
       },
+
       en: {
         translation: {
           appName: 'RSS agregator',
           appDescription: 'Start reading RSS today! It\'s easy, it\'s beautiful.',
+
           inputPlaceholder: 'RSS link',
           button: 'Add',
-          example: 'Example: https://ru.hexlet.io/lessons.rss',
+          example: 'Example: http://lorem-rss.herokuapp.com/feed',
+
           successMessage: 'RSS succesfuly processed',
           invalidUrlMessage: 'Link must be valid URL',
           existingUrlMessage: 'RSS already existing',
           notFoundMessage: 'Resource does not contain valid RSS',
-          descriptionBtn: 'Wiew',
+          networkErrorMessage: 'Network error',
+
           feeds: 'Feeds',
           posts: 'Posts',
+
+          openModalBtn: 'Wiew',
           modalMore: 'Read more',
           modalClose: 'Close',
         },

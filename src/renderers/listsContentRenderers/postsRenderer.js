@@ -38,7 +38,7 @@ const renderPosts = (posts, readedPostsLinks) => {
       modalLink.setAttribute('href', link);
     });
 
-    openModalButton.textContent = i18next.t('descriptionBtn');
+    openModalButton.textContent = i18next.t('openModalBtn');
     openModalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'modal-button');
     openModalButton.setAttribute('data-bs-toggle', 'modal');
     openModalButton.setAttribute('data-bs-target', '#modal');
