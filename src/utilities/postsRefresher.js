@@ -2,7 +2,7 @@ import makeRequest from './requestMaker';
 import parseData from './parser';
 import renderPosts from '../renderers/listsContentRenderers/postsRenderer.js';
 
-const refreshPosts = (urls, existingPosts) => {
+const refreshPosts = (urls, existingPosts, readedPostsLinks) => {
   const responses = urls.map((url) => makeRequest(url));
   const responsesArray = Promise.all(responses);
 
@@ -18,7 +18,7 @@ const refreshPosts = (urls, existingPosts) => {
         .filter((postContent) => !existingPostsContent.includes(postContent))
         .map((newPostContent) => freshPosts[freshPostsContent.indexOf(newPostContent)]);
 
-      renderPosts([...newPosts, ...existingPosts]);
+      renderPosts([...newPosts, ...existingPosts], readedPostsLinks);
     });
 };
 

@@ -26,11 +26,17 @@ const watch = (state) => onChange(state, (path, value) => {
       break;
 
     case 'rssContent.posts.existingPosts':
-      renderers.renderPosts(value);
+      renderers.renderPosts(value, state.rssContent.posts.readedPostsLinks);
 
       clearTimer();
-      setTimer(5000, () => refreshPosts(state.rssContent.addedUrls, value));
+      // eslint-disable-next-line max-len
+      setTimer(5000, () => refreshPosts(state.rssContent.addedUrls, value, state.rssContent.posts.readedPostsLinks));
       break;
+
+    case 'rssContent.posts.readedPostsLinks':
+      renderers.renderPosts(state.rssContent.posts.existingPosts, value);
+      break;
+
     case 'rssContent.feeds':
       renderers.renderFeeds(value);
       break;

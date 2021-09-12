@@ -16,7 +16,7 @@ const app = () => {
       feeds: [],
       posts: {
         existingPosts: [],
-        readedPosts: [],
+        readedPostsLinks: [],
       },
     },
   });
@@ -63,6 +63,19 @@ const app = () => {
             watchedState.rssContent.posts.existingPosts.push(...posts);
           });
       });
+  });
+
+  const postsContainer = document.getElementById('posts');
+
+  postsContainer.addEventListener('click', (event) => {
+    if (event.target.classList.contains('modal-button')) {
+      const readedPostLink = document.getElementById('modal-more');
+      watchedState.rssContent.posts.readedPostsLinks.push(readedPostLink.getAttribute('href'));
+    }
+
+    if (event.target.classList.contains('post-link')) {
+      watchedState.rssContent.posts.readedPostsLinks.push(event.target.getAttribute('href'));
+    }
   });
 };
 

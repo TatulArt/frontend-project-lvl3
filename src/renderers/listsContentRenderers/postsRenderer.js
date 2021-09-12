@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 
-const renderPosts = (posts) => {
+const renderPosts = (posts, readedPostsLinks) => {
   const postsList = document.getElementById('posts-list');
   postsList.innerHTML = '';
 
@@ -16,7 +16,14 @@ const renderPosts = (posts) => {
     postLink.textContent = title;
     postLink.setAttribute('href', link);
     postLink.setAttribute('target', '_blank');
-    postLink.classList.add('fw-bold');
+    postLink.classList.add('post-link');
+
+    if (readedPostsLinks.includes(link)) {
+      postLink.classList.add('fw-normal');
+      postLink.classList.add('text-secondary');
+    } else {
+      postLink.classList.add('fw-bold');
+    }
 
     const openModalButton = document.createElement('button');
 
