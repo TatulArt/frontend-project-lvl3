@@ -8,7 +8,7 @@ import translatePage from './utilities/translator.js';
 const app = () => {
   translatePage('ru');
 
-  const watchedState = watch({
+  const watchedState = watch({ 
     status: '',
     feedback: '',
     rssContent: {
