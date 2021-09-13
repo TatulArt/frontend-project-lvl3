@@ -8,7 +8,7 @@ import translatePage from './utilities/translator.js';
 const app = () => {
   translatePage('ru');
 
-  const watchedState = watch({ 
+  const watchedState = watch({
     status: '',
     feedback: '',
     rssContent: {
@@ -26,7 +26,7 @@ const app = () => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const inputData = formData.get('url-input');
+    const inputData = formData.get('url');
 
     const validationSchema = yup
       .string()
@@ -46,33 +46,31 @@ const app = () => {
 
         makeRequest(inputData)
           .then((response) => {
-            if (response.data.status.error !== undefined) {
-              watchedState.status = 'failed';
-
-              switch (response.data.status.error.name) {
-                case 'RequestError':
-                  watchedState.feedback = i18next.t('notFoundMessage');
-                  break;
-                case 'NetworkError':
-                  watchedState.feedback = i18next.t('networkErrorMessage');
-                  break;
-                default:
-                  watchedState.feedback = `Unknown error: ${response.data.status.error.name}`;
-                  break;
-              }
-
-              return;
+            const parsedData = parseData(response.data.contents);
+            if (parsedData.contains(parsedData.getElementsByTagName('parsererror')[0])) {
+              throw new Error('Request Error');
             }
 
             watchedState.status = 'loaded';
             watchedState.rssContent.addedUrls.push(inputData);
             watchedState.feedback = i18next.t('successMessage');
 
-            const parsedRss = parseData(response.data.contents);
-            watchedState.rssContent.feeds.push(parsedRss);
+            watchedState.rssContent.feeds.push(parsedData);
 
-            const posts = Array.from(parsedRss.getElementsByTagName('item'));
+            const posts = Array.from(parsedData.getElementsByTagName('item'));
             watchedState.rssContent.posts.existingPosts.push(...posts);
+          })
+          .catch((error) => {
+            switch (error.message) {
+              case 'Request Error':
+                watchedState.feedback = i18next.t('notFoundMessage');
+                break;
+              case 'Network Error':
+                watchedState.feedback = i18next.t('networkErrorMessage');
+                break;
+              default:
+                watchedState.feedback = error.message;
+            }
           });
       });
   });

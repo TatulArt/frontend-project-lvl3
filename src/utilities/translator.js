@@ -58,7 +58,7 @@ const translatePage = (lng) => {
     document.title = i18next.t('appName');
     document.getElementById('app-name').innerHTML = i18next.t('appName');
     document.getElementById('app-description').innerHTML = i18next.t('appDescription');
-    document.getElementById('url-input').setAttribute('placeholder', i18next.t('inputPlaceholder'));
+    document.getElementById('url').setAttribute('placeholder', i18next.t('inputPlaceholder'));
     document.getElementById('input-label').innerHTML = i18next.t('inputPlaceholder');
     document.getElementById('main-button').innerHTML = i18next.t('button');
     document.getElementById('example').innerHTML = i18next.t('example');

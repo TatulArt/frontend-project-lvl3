@@ -5,6 +5,7 @@ import blockButton from './buttonRenderers/buttonBlocker.js';
 import unblockButton from './buttonRenderers/buttonUnblocker.js';
 import renderPosts from './listsContentRenderers/postsRenderer.js';
 import renderLists from './listsContentRenderers/listsRenderer.js';
+import markReadedLinks from './listsContentRenderers/readedLinksMarker.js';
 
 export default {
   renderInvalid,
@@ -14,4 +15,5 @@ export default {
   renderFeeds,
   renderPosts,
   renderLists,
+  markReadedLinks,
 };

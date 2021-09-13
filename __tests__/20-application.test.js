@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 
-import init from '@hexlet/code';
+import init from '../src/app.js';
 
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 const readFixture = (filename) => {
@@ -29,7 +29,7 @@ const htmlUrl = 'https://ru.hexlet.io';
 const corsProxy = 'https://hexlet-allorigins.herokuapp.com';
 const corsProxyApi = `${corsProxy}/get`;
 
-const index = path.join(__dirname, '..', 'code', 'index.html');
+const index = path.join(__dirname, '..', 'index.html');
 const initHtml = fs.readFileSync(index, 'utf-8');
 
 const getResponseHandler = (url, data) => rest.get(corsProxyApi, (req, res, ctx) => {
@@ -104,7 +104,7 @@ test('validation (valid url)', async () => {
   expect(await screen.findByText(/Ссылка должна быть валидным URL/i)).toBeInTheDocument();
 });
 
-test('handling non-rss url', async () => {
+test.only('handling non-rss url', async () => {
   const handler = getResponseHandler(htmlUrl, html);
   server.use(handler);
 

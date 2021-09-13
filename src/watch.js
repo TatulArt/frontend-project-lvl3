@@ -34,7 +34,7 @@ const watch = (state) => onChange(state, (path, value) => {
       break;
 
     case 'rssContent.posts.readedPostsLinks':
-      renderers.renderPosts(state.rssContent.posts.existingPosts, value);
+      renderers.markReadedLinks(value);
       break;
 
     case 'rssContent.feeds':
