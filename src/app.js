@@ -57,10 +57,12 @@ const app = () => {
 
             watchedState.rssContent.feeds.push(parsedData);
 
-            const posts = Array.from(parsedData.getElementsByTagName('item'));
+            const posts = Array.from(parsedData.getElementsByTagName('item')).flat();
             watchedState.rssContent.posts.existingPosts.push(...posts);
           })
           .catch((error) => {
+            watchedState.status = 'failed';
+
             switch (error.message) {
               case 'Request Error':
                 watchedState.feedback = i18next.t('notFoundMessage');
@@ -74,6 +76,39 @@ const app = () => {
           });
       });
   });
+
+  const startUpdateingPosts = () => {
+    setTimeout(() => {
+      if (watchedState.rssContent.addedUrls.length === 0) {
+        startUpdateingPosts();
+        return;
+      }
+
+      const responses = watchedState.rssContent.addedUrls.map((url) => makeRequest(url));
+
+      Promise.all(responses)
+        .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
+        .then((allParsedRss) => {
+          const freshPosts = allParsedRss.map((parsedRss) => Array.from(parsedRss.getElementsByTagName('item'))).flat();
+          const freshPostsContent = freshPosts.map((post) => post.innerHTML);
+
+          // eslint-disable-next-line max-len
+          const existingPostsContent = watchedState.rssContent.posts.existingPosts.map((post) => post); // здесь все сыпится потому что тип post - это Proxy
+
+          console.log(existingPostsContent);
+          const newPosts = freshPostsContent
+            .filter((postContent) => !existingPostsContent.includes(postContent))
+            .map((newPostContent) => freshPosts[freshPostsContent.indexOf(newPostContent)]);
+
+          // console.log(newPosts);
+          watchedState.rssContent.posts.existingPosts.push(...newPosts);
+        });
+
+      startUpdateingPosts();
+    }, 5000);
+  };
+
+  startUpdateingPosts();
 
   const postsContainer = document.getElementById('posts');
 

@@ -1,19 +1,17 @@
 import onChange from 'on-change';
 import renderers from './renderers';
 import resetInput from './utilities/inputReseter';
-import refreshPosts from './utilities/postsRefresher.js';
-import { setTimer, clearTimer } from './utilities/timer.js';
 
 const watch = (state) => onChange(state, (path, value) => {
   switch (path) {
     case 'status':
-      renderers.unblockButton();
+      renderers.unblockForm();
 
       if (value === 'failed') {
         renderers.renderInvalid();
       }
       if (value === 'loading') {
-        renderers.blockButton();
+        renderers.blockForm();
       }
       if (value === 'loaded') {
         resetInput();
@@ -28,9 +26,6 @@ const watch = (state) => onChange(state, (path, value) => {
     case 'rssContent.posts.existingPosts':
       renderers.renderPosts(value, state.rssContent.posts.readedPostsLinks);
 
-      clearTimer();
-      // eslint-disable-next-line max-len
-      setTimer(5000, () => refreshPosts(state.rssContent.addedUrls, value, state.rssContent.posts.readedPostsLinks));
       break;
 
     case 'rssContent.posts.readedPostsLinks':
