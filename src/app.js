@@ -16,10 +16,32 @@ const app = () => {
       feeds: [],
       posts: {
         existingPosts: [],
+        newPosts: [],
         readedPostsLinks: [],
       },
     },
   });
+
+  const startUpdatingPosts = () => {
+    setTimeout(() => {
+      if (watchedState.rssContent.addedUrls.length === 0) {
+        startUpdatingPosts();
+        return;
+      }
+
+      const responses = watchedState.rssContent.addedUrls.map((url) => makeRequest(url));
+      Promise.all(responses)
+        .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
+        .then((allParsedRss) => {
+          const newPosts = allParsedRss.map((parsedRss) => parsedRss.posts).flat();
+          watchedState.rssContent.posts.newPosts = newPosts;
+        });
+
+      startUpdatingPosts();
+    }, 5000);
+  };
+
+  startUpdatingPosts();
 
   const form = document.getElementById('form');
   form.addEventListener('submit', (e) => {
@@ -46,8 +68,9 @@ const app = () => {
 
         makeRequest(inputData)
           .then((response) => {
-            const parsedData = parseData(response.data.contents);
-            if (parsedData.contains(parsedData.getElementsByTagName('parsererror')[0])) {
+            const { feed, posts } = parseData(response.data.contents);
+
+            if (feed.contains(feed.getElementsByTagName('parsererror')[0])) {
               throw new Error('Request Error');
             }
 
@@ -55,9 +78,7 @@ const app = () => {
             watchedState.rssContent.addedUrls.push(inputData);
             watchedState.feedback = i18next.t('successMessage');
 
-            watchedState.rssContent.feeds.push(parsedData);
-
-            const posts = Array.from(parsedData.getElementsByTagName('item')).flat();
+            watchedState.rssContent.feeds.push(feed);
             watchedState.rssContent.posts.existingPosts.push(...posts);
           })
           .catch((error) => {
@@ -76,39 +97,6 @@ const app = () => {
           });
       });
   });
-
-  const startUpdateingPosts = () => {
-    setTimeout(() => {
-      if (watchedState.rssContent.addedUrls.length === 0) {
-        startUpdateingPosts();
-        return;
-      }
-
-      const responses = watchedState.rssContent.addedUrls.map((url) => makeRequest(url));
-
-      Promise.all(responses)
-        .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
-        .then((allParsedRss) => {
-          const freshPosts = allParsedRss.map((parsedRss) => Array.from(parsedRss.getElementsByTagName('item'))).flat();
-          const freshPostsContent = freshPosts.map((post) => post.innerHTML);
-
-          // eslint-disable-next-line max-len
-          const existingPostsContent = watchedState.rssContent.posts.existingPosts.map((post) => post); // здесь все сыпится потому что тип post - это Proxy
-
-          console.log(existingPostsContent);
-          const newPosts = freshPostsContent
-            .filter((postContent) => !existingPostsContent.includes(postContent))
-            .map((newPostContent) => freshPosts[freshPostsContent.indexOf(newPostContent)]);
-
-          // console.log(newPosts);
-          watchedState.rssContent.posts.existingPosts.push(...newPosts);
-        });
-
-      startUpdateingPosts();
-    }, 5000);
-  };
-
-  startUpdateingPosts();
 
   const postsContainer = document.getElementById('posts');
 

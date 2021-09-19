@@ -6,14 +6,16 @@ import unblockForm from './formControllers/formUnblocker.js';
 import renderPosts from './listsContentRenderers/postsRenderer.js';
 import renderLists from './listsContentRenderers/listsRenderer.js';
 import markReadedLinks from './listsContentRenderers/readedLinksMarker.js';
+import updatePosts from './listsContentRenderers/postsUpdater.js';
 
 export default {
-  renderInvalid,
-  renderFeedback,
   blockForm,
   unblockForm,
+  renderInvalid,
+  renderFeedback,
+  renderLists,
   renderFeeds,
   renderPosts,
-  renderLists,
+  updatePosts,
   markReadedLinks,
 };

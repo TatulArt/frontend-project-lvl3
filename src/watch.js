@@ -16,7 +16,6 @@ const watch = (state) => onChange(state, (path, value) => {
       if (value === 'loaded') {
         resetInput();
       }
-
       break;
 
     case 'feedback':
@@ -25,7 +24,13 @@ const watch = (state) => onChange(state, (path, value) => {
 
     case 'rssContent.posts.existingPosts':
       renderers.renderPosts(value, state.rssContent.posts.readedPostsLinks);
+      break;
 
+    case 'rssContent.posts.newPosts':
+      renderers.renderPosts(
+        renderers.updatePosts(value, state.rssContent.posts.existingPosts),
+        state.rssContent.posts.readedPostsLinks,
+      );
       break;
 
     case 'rssContent.posts.readedPostsLinks':

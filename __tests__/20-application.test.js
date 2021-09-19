@@ -73,7 +73,7 @@ afterEach(() => {
   server.resetHandlers();
 });
 
-test.only('adding', async () => {
+test('adding', async () => {
   const handler = getResponseHandler(rssUrl, rss1);
   server.use(handler);
 
@@ -83,7 +83,7 @@ test.only('adding', async () => {
   expect(await screen.findByText(/RSS успешно загружен/i)).toBeInTheDocument();
 });
 
-test.only('validation (unique)', async () => {
+test('validation (unique)', async () => {
   const handler = getResponseHandler(rssUrl, rss1);
   server.use(handler);
 
