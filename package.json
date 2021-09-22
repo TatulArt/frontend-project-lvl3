@@ -47,6 +47,7 @@
     "i18next": "^20.4.0",
     "lodash": "^4.17.21",
     "on-change": "^3.0.2",
+    "read-package-json-fast": "^2.0.3",
     "yup": "^0.32.9"
   }
 }
