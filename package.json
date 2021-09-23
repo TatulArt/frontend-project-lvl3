@@ -2,7 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "RSS agregator",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "npx jest __tests__/20-application.test.js --watch",
     "build": "webpack --mode=production --node-env=production",
