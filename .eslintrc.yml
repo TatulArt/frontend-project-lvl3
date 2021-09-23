@@ -1,11 +1,26 @@
+---
+
+plugins:
+  - jest
+  - testing-library
+  - jest-dom
+
 env:
+  jest: true
   browser: true
-  es2021: true
+  es2020: true
+
 extends:
-  - airbnb-base
+  - 'airbnb-base'
+  - 'plugin:jest/recommended'
+  - 'plugin:testing-library/react'
+  - "plugin:jest-dom/recommended"
+
 parserOptions:
-  ecmaVersion: 12
-  sourceType: module
-rules: {
+  ecmaVersion: 2020
+
+rules:
   import/extensions: 0
-}
+  import/no-unresolved: 0
+  no-param-reassign: 0
+  no-console: 0
