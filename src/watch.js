@@ -1,5 +1,5 @@
 import onChange from 'on-change';
-import renderers from './renderers';
+import renderers from './utilities/renderers';
 import resetInput from './utilities/inputReseter';
 
 const watch = (state) => onChange(state, (path, value) => {
@@ -22,18 +22,11 @@ const watch = (state) => onChange(state, (path, value) => {
       renderers.renderFeedback(value, state.status);
       break;
 
-    case 'rssContent.posts.existingPosts':
-      renderers.renderPosts(value, state.rssContent.posts.readedPostsLinks);
+    case 'rssContent.postsData.posts':
+      renderers.renderPosts(value, state.rssContent.postsData.readedPostsLinks);
       break;
 
-    case 'rssContent.posts.newPosts':
-      renderers.renderPosts(
-        renderers.updatePosts(value, state.rssContent.posts.existingPosts),
-        state.rssContent.posts.readedPostsLinks,
-      );
-      break;
-
-    case 'rssContent.posts.readedPostsLinks':
+    case 'rssContent.postsData.readedPostsLinks':
       renderers.markReadedLinks(value);
       break;
 

@@ -1,12 +1,34 @@
 import * as yup from 'yup';
 import i18next from 'i18next';
+import axios from 'axios';
 import parseData from './utilities/parser.js';
 import watch from './watch.js';
-import makeRequest from './utilities/requestMaker.js';
-import translatePage from './utilities/translator.js';
+import validateUrl from './utilities/urlValidator.js';
+import resources from './utilities/translatingResources.js';
 
 const app = () => {
-  translatePage('ru');
+  i18next.init({
+    lng: 'ru',
+    debug: true,
+    resources,
+  }).then(() => {
+    document.title = i18next.t('appName');
+    document.getElementById('app-name').innerHTML = i18next.t('appName');
+    document.getElementById('app-description').innerHTML = i18next.t('appDescription');
+    document.getElementById('url').setAttribute('placeholder', i18next.t('inputPlaceholder'));
+    document.getElementById('input-label').innerHTML = i18next.t('inputPlaceholder');
+    document.getElementById('main-button').innerHTML = i18next.t('button');
+    document.getElementById('example').innerHTML = i18next.t('example');
+    document.getElementById('modal-more').innerHTML = i18next.t('modalMore');
+    document.getElementById('modal-close').innerHTML = i18next.t('modalClose');
+  });
+
+  yup.setLocale({
+    string: {
+      url: i18next.t('invalidUrlMessage'),
+      notOneOf: i18next.t('existingUrlMessage'),
+    },
+  });
 
   const watchedState = watch({
     status: '',
@@ -14,9 +36,8 @@ const app = () => {
     rssContent: {
       addedUrls: [],
       feeds: [],
-      posts: {
-        existingPosts: [],
-        newPosts: [],
+      postsData: {
+        posts: [],
         readedPostsLinks: [],
       },
     },
@@ -24,20 +45,34 @@ const app = () => {
 
   const startUpdatingPosts = () => {
     setTimeout(() => {
-      if (watchedState.rssContent.addedUrls.length === 0) {
+      const responses = watchedState.rssContent.addedUrls.map((url) => axios.get(validateUrl(url)));
+
+      if (responses.length === 0) {
         startUpdatingPosts();
         return;
       }
 
-      const responses = watchedState.rssContent.addedUrls.map((url) => makeRequest(url));
       Promise.all(responses)
         .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
         .then((allParsedRss) => {
-          const newPosts = allParsedRss.map((parsedRss) => parsedRss.posts).flat();
-          watchedState.rssContent.posts.newPosts = newPosts;
-        });
+          const addedPostsLinks = watchedState.rssContent.postsData.posts.map((post) => post.link);
 
-      startUpdatingPosts();
+          const newPosts = allParsedRss
+            .map((parsedRss) => parsedRss.posts)
+            .flat()
+            .filter((newPost) => {
+              const newPostLink = newPost.link;
+
+              if (!addedPostsLinks.includes(newPostLink)) {
+                return true;
+              }
+
+              return false;
+            });
+
+          watchedState.rssContent.postsData.posts.unshift(...newPosts);
+          startUpdatingPosts();
+        });
     }, 5000);
   };
 
@@ -66,27 +101,24 @@ const app = () => {
           return;
         }
 
-        makeRequest(inputData)
+        axios.get(validateUrl(inputData))
           .then((response) => {
             const { feed, posts } = parseData(response.data.contents);
-
-            if (feed.contains(feed.getElementsByTagName('parsererror')[0])) {
-              throw new Error('Request Error');
-            }
 
             watchedState.status = 'loaded';
             watchedState.rssContent.addedUrls.push(inputData);
             watchedState.feedback = i18next.t('successMessage');
 
             watchedState.rssContent.feeds.push(feed);
-            watchedState.rssContent.posts.existingPosts.push(...posts);
+            watchedState.rssContent.postsData.posts.push(...posts);
           })
           .catch((error) => {
             watchedState.status = 'failed';
+            console.log(error);
 
             switch (error.message) {
               case 'Request Error':
-                watchedState.feedback = i18next.t('notFoundMessage');
+                watchedState.feedback = i18next.t('requestErrorMessage');
                 break;
               case 'Network Error':
                 watchedState.feedback = i18next.t('networkErrorMessage');
@@ -103,11 +135,11 @@ const app = () => {
   postsContainer.addEventListener('click', (event) => {
     if (event.target.classList.contains('modal-button')) {
       const readedPostLink = document.getElementById('modal-more');
-      watchedState.rssContent.posts.readedPostsLinks.push(readedPostLink.getAttribute('href'));
+      watchedState.rssContent.postsData.readedPostsLinks.push(readedPostLink.getAttribute('href'));
     }
 
     if (event.target.classList.contains('post-link')) {
-      watchedState.rssContent.posts.readedPostsLinks.push(event.target.getAttribute('href'));
+      watchedState.rssContent.postsData.readedPostsLinks.push(event.target.getAttribute('href'));
     }
   });
 };
