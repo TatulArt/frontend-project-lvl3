@@ -4,4 +4,6 @@
 
 RSS аггрегатор:
 
-    https://frontend-project-lvl3-j94cco6dx-tatulart.vercel.app
+    https://frontend-project-lvl3-tatulart.vercel.app
+
+Доступный в использовании аггрегатор RSS-ссылок.

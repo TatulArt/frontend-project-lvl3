@@ -45,7 +45,9 @@ const app = () => {
 
   const startUpdatingPosts = () => {
     setTimeout(() => {
-      const responses = watchedState.rssContent.addedUrls.map((url) => axios.get(validateUrl(url)));
+      const responses = watchedState.rssContent.addedUrls.map((url) => axios.get(validateUrl(url))
+        .then((response) => ({ result: 'success', response }))
+        .catch((error) => ({ result: 'error', error })));
 
       if (responses.length === 0) {
         startUpdatingPosts();
@@ -53,7 +55,13 @@ const app = () => {
       }
 
       Promise.all(responses)
-        .then((arrayContent) => arrayContent.map((response) => parseData(response.data.contents)))
+        .then((responsesArray) => responsesArray.map((responseObject) => {
+          if (responseObject.result === 'error') {
+            throw new Error(responseObject.error);
+          }
+
+          return parseData(responseObject.response.data.contents);
+        }))
         .then((allParsedRss) => {
           const addedPostsLinks = watchedState.rssContent.postsData.posts.map((post) => post.link);
 
@@ -114,7 +122,6 @@ const app = () => {
           })
           .catch((error) => {
             watchedState.status = 'failed';
-            console.log(error);
 
             switch (error.message) {
               case 'Request Error':
